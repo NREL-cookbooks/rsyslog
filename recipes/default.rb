@@ -7,8 +7,13 @@
 # All rights reserved - Do Not Redistribute
 #
 
-package "rsyslog" do
-  action :upgrade
+package "rsyslog"
+
+directory "/etc/rsyslog.d" do
+  mode 0755
+  owner "root"
+  group "root"
+  action :create
 end
 
 template "/etc/rsyslog.conf" do
@@ -16,10 +21,10 @@ template "/etc/rsyslog.conf" do
   owner "root"
   group "root"
   mode "0644"
-  notifies :reload, "service[rsyslog]"
+  notifies :restart, "service[rsyslog]"
 end
 
 service "rsyslog" do
-  supports :status => true, :restart => true, :reload => true
+  supports :status => true, :restart => true
   action [:enable, :start]
 end

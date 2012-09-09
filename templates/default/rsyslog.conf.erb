@@ -2,16 +2,16 @@
 ##### GENEARTED BY CHEF. LOCAL MODIFICATIONS WILL BE REPLACED. #####
 ####################################################################
 
-#rsyslog v3 config file
+# rsyslog v5 configuration file
 
-# if you experience problems, check
-# http://www.rsyslog.com/troubleshoot for assistance
+# For more information see /usr/share/doc/rsyslog-*/rsyslog_conf.html
+# If you experience problems, see http://www.rsyslog.com/doc/troubleshoot.html
 
 #### MODULES ####
 
-$ModLoad imuxsock.so    # provides support for local system logging (e.g. via logger command)
-$ModLoad imklog.so      # provides kernel logging support (previously done by rklogd)
-#$ModLoad immark.so     # provides --MARK-- message capability
+$ModLoad imuxsock # provides support for local system logging (e.g. via logger command)
+$ModLoad imklog   # provides kernel logging support (previously done by rklogd)
+#$ModLoad immark  # provides --MARK-- message capability
 
 <% if(node[:rsyslog][:network][:enable]) %>
 <% if(node[:rsyslog][:network][:protocol] == "udp") %>
@@ -33,19 +33,15 @@ $InputTCPServerRun 514
 # Use default timestamp format
 $ActionFileDefaultTemplate RSYSLOG_TraditionalFileFormat
 
-# File syncing capability is disabled by default. This feature is usually not required, 
+# File syncing capability is disabled by default. This feature is usually not required,
 # not useful and an extreme performance hit
 #$ActionFileEnableSync on
 
+# Include all config files in /etc/rsyslog.d/
+$IncludeConfig /etc/rsyslog.d/*.conf
+
 
 #### RULES ####
-
-<% if(node.recipe?("haproxy")) %>
-# Log haproxy messages
-:programname, isequal, "haproxy"                        <%= node[:haproxy][:log][:file] %>
-# Now discard haproxy messages so they don't appear in /var/log/messages 
-:programname, isequal, "haproxy" ~
-<% end %>
 
 # Log all kernel messages to the console.
 # Logging much else clutters up the screen.
@@ -83,7 +79,7 @@ local7.*                                                /var/log/boot.log
 #
 # An on-disk queue is created for this action. If the remote host is
 # down, messages are spooled to disk and sent when it is up again.
-#$WorkDirectory /var/spppl/rsyslog # where to place spool files
+#$WorkDirectory /var/lib/rsyslog # where to place spool files
 #$ActionQueueFileName fwdRule1 # unique name prefix for spool files
 #$ActionQueueMaxDiskSpace 1g   # 1gb space limit (use as much as possible)
 #$ActionQueueSaveOnShutdown on # save messages to disk on shutdown
